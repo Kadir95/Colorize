@@ -289,7 +289,7 @@ randomfillbutton.bind('<Button-1>', RandomFill)
 saveImageButton.grid(row=0, column=5, sticky=E+N+S)
 
 # Label packing and function
-labelphoto.grid(row=1, column=0, sticky=W+N+E+S)
+labelphoto.grid(row=1, column=0)
 labelphoto.bind('<Button-1>', labelClick)
 
 # Color Show label
