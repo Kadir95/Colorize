@@ -24,7 +24,7 @@ class ColorPalette:
         if colorstext is None:
             return
 
-        expression = re.compile('^[^#]\s*([0-9]+)\s*([0-9]+)\s*([0-9]+)')
+        expression = re.compile('^\s*([0-9]+)\s*([0-9]+)\s*([0-9]+)')
         lines = colorstext.readlines()
 
         for line in lines:
@@ -67,7 +67,7 @@ class ColorPalette:
             for y in range(0, row):
                 if x*row + y >= len(self.colors):
                     break
-                print(self.colors[x*row + y])
+                print(self.colors[x*row + y] , "  x*row + y:", x*row + y, " x:", x, " y:", y)
                 label = Label(self.colorframe, bg=self.colors[x*row + y][1],  width=x_size, height=y_size)
                 label.grid(row=y, column=x)
                 label.bind('<Button-1>', command)

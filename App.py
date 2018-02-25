@@ -1,11 +1,10 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import colorchooser
+from ColorPalette import *
 import layering
 from PIL import Image, ImageTk
 import numpy
-
-# Random fill button
 
 stdsize = (800, 800)
 stdfalldown = 127
@@ -14,7 +13,7 @@ currentphotofilepath    = None
 currentphoto            = None
 currentlayer            = None
 currentcolor            = ((255, 0, 0), '#ff0000')
-colorpalette            = None
+colorpalettefile            = None
 
 
 def openfile():
@@ -167,9 +166,8 @@ def RedoFunc(event):
     labelphoto.image = image
 
 def ColorPaletteColorSelecitonFunc(event):
-    pix = colorpalette[0].load()
-    colorrgb = pix[event.x, event.y]
-    colorhex = "#%02x%02x%02x" % colorrgb
+    colorhex = event.widget["background"]
+    colorrgb = tuple(int(colorhex[1:][i: i+2], 16) for i in (0, 2, 4))
     global currentcolor
     currentcolor = (colorrgb, colorhex)
     colorshowlabel.configure(bg=currentcolor[1])
@@ -183,7 +181,7 @@ root.title("Image Fill")
 root.resizable(False, False)
 
 # right side color palette image loading
-colorpalette = resizeImage(openimage(open(mode="r",file="Color_Palette.jpg").name), size=(70, 750), ratio=False)
+colorpalettefile = "Colors.palette"
 
 ima = resizeImage(openimage('JPG-logo-highres_400x400.jpg'), size=stdsize)
 photo = tkPhoto(converttobalckandwhite(ima[0]))
@@ -195,6 +193,7 @@ leftframe = Frame(root)
 
 # Configure Frame
 conframe = Frame(topframe)
+
 # Open File and Select Color buttons
 button = Button(conframe, text='Open File')
 buttoncolor = Button(conframe, text='Select Color')
@@ -233,9 +232,9 @@ redoButton.grid(row=1, column=0)
 colorshowlabel = Label(leftframe, width=5, height=3, bg=currentcolor[1])
 
 # Color Selection Palette
-tkcolorpaletteiamge = tkPhoto(colorpalette[0])
-colorselectionpalette = Label(leftframe, image=tkcolorpaletteiamge)
-colorselectionpalette.image = tkcolorpaletteiamge
+colorpaletteOBJ = ColorPalette(colorpalettefile)
+colorselectionpaletteframe = colorpaletteOBJ.frame(root=leftframe, row=None, column=4, size=(10, 700/28), command=ColorPaletteColorSelecitonFunc)
+
 
 # slider pack
 scale.grid(row=0, column=2)
@@ -259,8 +258,7 @@ labelphoto.bind('<Button-1>', labelClick)
 colorshowlabel.grid(row=1, column=0, sticky=S)
 
 # Color Palette label pack and func
-colorselectionpalette.grid(row=0, column=0, sticky=N+S)
-colorselectionpalette.bind('<Button-1>', ColorPaletteColorSelecitonFunc)
+colorselectionpaletteframe.grid(row=0, column=0, sticky=N+S)
 
 # Frames packing
 topframe.grid(row=0, column=0, sticky=E+W)
