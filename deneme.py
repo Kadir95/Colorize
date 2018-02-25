@@ -1,4 +1,4 @@
-from ColorPalette import *
+from colorPalette import *
 from tkinter import *
 
 root = Tk()

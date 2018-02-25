@@ -14,9 +14,11 @@ class ColorPalette:
         self.colorframe = None
         #self.labels = []
 
+        """
         for i in self.colors:
             print(i)
         print(len(self.colors))
+        """
 
     def initColors(self):
         colorstext = open(mode="r", file=self.color_palette_file)
@@ -67,7 +69,9 @@ class ColorPalette:
             for y in range(0, row):
                 if x*row + y >= len(self.colors):
                     break
-                print(self.colors[x*row + y] , "  x*row + y:", x*row + y, " x:", x, " y:", y)
+
+                #print(self.colors[x*row + y] , "  x*row + y:", x*row + y, " x:", x, " y:", y)
+
                 label = Label(self.colorframe, bg=self.colors[x*row + y][1],  width=x_size, height=y_size)
                 label.grid(row=y, column=x)
                 label.bind('<Button-1>', command)

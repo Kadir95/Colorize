@@ -3,6 +3,13 @@ import numpy
 class Number:                       #This class change the int to a reference type
     def __init__(self, number):
         self.number = int(number)
+        self.color  = ((255, 255, 255), "#ffffff")
+
+    def giveColor(self, color):
+        self.color = color
+
+    def getColor(self):
+        return self.color
 
     def change(self, number):
         self.number = int(number)
@@ -53,6 +60,7 @@ class Layer:
         self.undoStack = []
         self.redoStack = []
         self.array = None
+        self.layerlist = None
         self.createArray()
 
     def paint(self, mx, my, color):
@@ -72,17 +80,20 @@ class Layer:
             if pix[mx, my] == color[0]:
                 return self.imagePaint
 
+            if layerToPaint.get() == 0:
+                return self.imagePaint
+
             # Undo Stack
             self.undoStack.append(self.imagePaint.copy())
             self.redoStack.clear()
 
-            if layerToPaint.get() == 0:
-                return self.imagePaint
+            for i in self.layerlist:
+                if i.get() == layerToPaint.get():
+                    i.giveColor(color=color)
 
             for y in range(0, len(self.array)):
                 for x in range(0, len(self.array[0])):
-                    if layerToPaint == self.array[y][x]:
-                        pix[x, y] = color[0]
+                    pix[x, y] = self.array[y][x].color[0]
 
         return self.imagePaint
 
@@ -118,6 +129,8 @@ class Layer:
                             for i in layersList:
                                 if i.number == temp:
                                     i.change(up.get())
+
+        self.layerlist = layersList
         """
         for y in self.array:
             for x in y:
@@ -169,6 +182,8 @@ class Layer:
                     else:
                         layerList.append(Number(len(layerList) + 1))
                         self.array[y][x] = layerList[len(layerList) - 1]
+
+        self.layerlist = layerList
         """
         for y in self.array:
             for x in y:
@@ -184,6 +199,8 @@ class Layer:
 
         one = Number(1)
         zero = Number(0)
+        zero.color = ((0, 0, 0), "#000000")
+
 
         for i in range(len(self.imagearray)):
             for j in range(len(self.imagearray[0])):
@@ -209,12 +226,23 @@ class Layer:
             return self.image
         return self.imagePaint
 
+    def refreshImage(self):
+        if self.imagePaint is None:
+            self.imagePaint = self.image.copy()
+            self.imagePaint = self.imagePaint.convert("RGB")
 
-def printArray(array):
-    for i in range(0, len(array)):
-        for j in array[i]:
-            print("%2d" %(j) , ',', end='')
-        print()
+        # Undo Stack
+        self.undoStack.append(self.imagePaint.copy())
+        self.redoStack.clear()
+
+        pix = self.imagePaint.load()
+
+        for y in range(0, len(self.array)):
+            for x in range(0, len(self.array[0])):
+                pix[x, y] = self.array[y][x].color[0]
+
+        return self.imagePaint
+
 
 def checkpixel(array, x, y):
     if len(array) > y >= 0 and len(array[0]) > x >= 0:

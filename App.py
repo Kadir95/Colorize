@@ -1,20 +1,25 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import colorchooser
-from ColorPalette import *
+from colorPalette import *
 import layering
 from PIL import Image, ImageTk
 import numpy
+import random
 
-stdsize = (800, 800)
+# image scaling
+
+stdsize = (500, 500)
 stdfalldown = 127
 
 currentphotofilepath    = None
 currentphoto            = None
 currentlayer            = None
 currentcolor            = ((255, 0, 0), '#ff0000')
-colorpalettefile            = None
+colorpalettefile        = None
+colorpaletteOBJ         = None
 
+imageColorSelection = False
 
 def openfile():
     filedir = filedialog.askopenfile(title='Choose Image File', filetypes=[("Image",("*.img","*.jpg","*.png"))])
@@ -50,7 +55,6 @@ def converttobalckandwhite(image):
                 image[i][j] = 255
             else:
                 image[i][j] = 0
-    print(image)
     image = Image.fromarray(image)
     return image
 
@@ -77,14 +81,16 @@ def tkPhoto(image):
     currentphoto = image
     return ImageTk.PhotoImage(image)
 
-def displayPhoto(event, file = None):
-    im = None
+def displayPhoto(event=None, file = None):
     if file is None:
-        #im = resizeImage(converttobalckandwhite(openimage(openfile())), size=stdsize)
-        im = converttobalckandwhite(openimage(openfile()))
-    else:
-        #im = resizeImage(converttobalckandwhite(openimage(file)), size=stdsize)
-        im = converttobalckandwhite(openimage(file))
+        file = openfile()
+        if file is None:
+            return
+
+    im = None
+
+    #im = resizeImage(converttobalckandwhite(openimage(file)), size=stdsize)
+    im = converttobalckandwhite(openimage(file))
 
     #im = im[0]
     photo = tkPhoto(im)
@@ -107,6 +113,17 @@ def displayPhoto(event, file = None):
     return photo
 
 def labelClick(event):
+    global imageColorSelection
+    if imageColorSelection:
+        pix = currentlayer.currentImage().load()
+        colorrgb = pix[event.x, event.y]
+        colorhex = "#%02x%02x%02x" %(colorrgb)
+        global currentcolor
+        currentcolor = (colorrgb, colorhex)
+        colorshowlabel.configure(bg=currentcolor[1])
+        imageColorSelection = False
+        return
+
     if currentlayer is None or currentcolor is None or currentphoto is None:
         if currentlayer is None:
             print("Current layer Doesn't Found")
@@ -122,7 +139,7 @@ def labelClick(event):
     print("x:", event.x, " y:", event.y)
 
 def sliderFunction(value):
-    print("slider value : ", value)
+    #print("slider value : ", value)
     global stdfalldown
     stdfalldown = int(value)
 
@@ -172,7 +189,23 @@ def ColorPaletteColorSelecitonFunc(event):
     currentcolor = (colorrgb, colorhex)
     colorshowlabel.configure(bg=currentcolor[1])
 
-def RandomFill():
+def RandomFill(event):
+
+    for i in currentlayer.layerlist:
+        choosencolor = random.choice(colorpaletteOBJ.colors)
+        for j in currentlayer.layerlist:
+            if i == j:
+                j.giveColor(choosencolor)
+
+    image = currentlayer.refreshImage()
+    image = tkPhoto(image)
+    labelphoto.configure(image=image, width=image.width(), height=image.height())  # , width=im[1], height=im[2])
+    labelphoto.image = image
+    return
+
+def imageColorSelectionButtonFunc():
+    global imageColorSelection
+    imageColorSelection = True
     return
 
 # Root tk object and basic windows  settings
@@ -183,10 +216,9 @@ root.resizable(False, False)
 # right side color palette image loading
 colorpalettefile = "Colors.palette"
 
-ima = resizeImage(openimage('JPG-logo-highres_400x400.jpg'), size=stdsize)
-photo = tkPhoto(converttobalckandwhite(ima[0]))
-labelphoto = Label(root, image=photo, width=ima[1], height=ima[2])
-labelphoto.image = photo
+#ima = resizeImage(openimage('JPG-logo-highres_400x400.jpg'), size=stdsize)
+#photo = tkPhoto(converttobalckandwhite(ima[0]))
+labelphoto = Label(root)
 
 topframe = Frame(root)
 leftframe = Frame(root)
@@ -213,8 +245,8 @@ radioFrame = Frame(topframe)
 
 # Radio Buttons
 radio_var = IntVar(value=1)
-four_connected_radiobutton = Radiobutton(radioFrame, text="Four Connected", variable=radio_var, value=1).pack()
-eight_connected_radiobutton = Radiobutton(radioFrame, text="Eight Connected", variable=radio_var, value=2).pack()
+four_connected_radiobutton = Radiobutton(radioFrame, text="Four Connected", variable=radio_var, value=1).pack(fill=X)
+eight_connected_radiobutton = Radiobutton(radioFrame, text="Eight Connected", variable=radio_var, value=2).pack(fill=X)
 
 # Slider
 scale = Scale(topframe, from_=0, to=255, orient=HORIZONTAL, command=sliderFunction)
@@ -228,12 +260,18 @@ buttoncolor.grid(row=1, column=0, sticky=W+E)
 undoButton.grid(row=0, column=0)
 redoButton.grid(row=1, column=0)
 
+# Random Fill Button
+randomfillbutton = Button(topframe, text="Random\nFill")
+
 # Show color selection
 colorshowlabel = Label(leftframe, width=5, height=3, bg=currentcolor[1])
 
+# Color selection from image
+imageColorSelectionButton = Button(leftframe, text="Pick\nColor", command=imageColorSelectionButtonFunc)
+
 # Color Selection Palette
 colorpaletteOBJ = ColorPalette(colorpalettefile)
-colorselectionpaletteframe = colorpaletteOBJ.frame(root=leftframe, row=None, column=4, size=(10, 700/28), command=ColorPaletteColorSelecitonFunc)
+colorselectionpaletteframe = colorpaletteOBJ.frame(root=leftframe, row=None, column=4, size=(11, 700/28), command=ColorPaletteColorSelecitonFunc)
 
 
 # slider pack
@@ -247,6 +285,10 @@ buttoncolor.bind('<Button-1>', selectColor)
 undoButton.bind('<Button-1>', UndoFunc)
 redoButton.bind('<Button-1>', RedoFunc)
 
+# Random Fill Button packing and Func
+randomfillbutton.grid(row=0, column=6, sticky=E+N+S)
+randomfillbutton.bind('<Button-1>', RandomFill)
+
 # Save Image Button packing
 saveImageButton.grid(row=0, column=5, sticky=E+N+S)
 
@@ -255,17 +297,23 @@ labelphoto.grid(row=1, column=0)
 labelphoto.bind('<Button-1>', labelClick)
 
 # Color Show label
-colorshowlabel.grid(row=1, column=0, sticky=S)
+colorshowlabel.grid(row=2, column=0, sticky=S)
+
+# İmage pick up button pack
+imageColorSelectionButton.grid(row=0, column=0, sticky=W+E)
 
 # Color Palette label pack and func
-colorselectionpaletteframe.grid(row=0, column=0, sticky=N+S)
+colorselectionpaletteframe.grid(row=1, column=0, sticky=N+S)
 
 # Frames packing
-topframe.grid(row=0, column=0, sticky=E+W)
-leftframe.grid(row= 1, column=1, sticky=N+S)
+topframe.grid(row=0, column=0, columnspan=2, sticky=E+W)
+leftframe.grid(row= 1, column=1, sticky=N+S+E)
 conframe.grid(row=0, column=0, sticky=W)
 radioFrame.grid(row=0, column=3, sticky=E)
 ruFrame.grid(row=0, column=4, sticky=E)
+
+# default image loading
+displayPhoto(file='JPG-logo-highres_400x400.jpg')
 
 # Main Loop
 root.mainloop()
