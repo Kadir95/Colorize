@@ -9,7 +9,7 @@ import random
 
 # image scaling
 
-stdsize = (500, 500)
+stdsize = (1200, 800)
 stdfalldown = 127
 
 currentphotofilepath    = None
@@ -69,7 +69,7 @@ def resizeImage(image, size = None, ratio=True):
             image = image.resize((int(image.size[0] * percente), int(image.size[1] * percente)), Image.ANTIALIAS)
         else:
             image = image.resize((size[0], size[1]), Image.ANTIALIAS)
-    return image, image.size[0], image.size[1]
+    return image
 
 def openimage(photofile):
     global currentphotofilepath
@@ -87,28 +87,24 @@ def displayPhoto(event=None, file = None):
         if file is None:
             return
 
-    im = None
+    im = openimage(file)
 
-    #im = resizeImage(converttobalckandwhite(openimage(file)), size=stdsize)
-    im = converttobalckandwhite(openimage(file))
+    if im.size[0] > stdsize[0] or im.size[1] > stdsize[1]:
+        im = converttobalckandwhite(resizeImage(im, size=stdsize))
+    else:
+        im = converttobalckandwhite(im)
 
-    #im = im[0]
     photo = tkPhoto(im)
 
     global currentlayer
     currentlayer = layering.Layer(im)
-
-    #layering.printArray(currentlayer.array)
-    #print()
 
     if radio_var.get() == 1:
         currentlayer.fourConnectedComponent()
     else:
         currentlayer.eightConnectedComponent()
 
-    #layering.printArray(currentlayer.array)
-
-    labelphoto.configure(image=photo, width=photo.width(), height=photo.height()) #, width=im[1], height=im[2])
+    labelphoto.configure(image=photo, width=photo.width(), height=photo.height())
     labelphoto.image = photo
     return photo
 
@@ -257,8 +253,8 @@ button.grid(row=0, column=0, sticky=W+E)
 buttoncolor.grid(row=1, column=0, sticky=W+E)
 
 # Undo Button packing
-undoButton.grid(row=0, column=0)
-redoButton.grid(row=1, column=0)
+undoButton.grid(row=0, column=0, sticky=W+E)
+redoButton.grid(row=1, column=0, sticky=W+E)
 
 # Random Fill Button
 randomfillbutton = Button(topframe, text="Random\nFill")
@@ -293,7 +289,7 @@ randomfillbutton.bind('<Button-1>', RandomFill)
 saveImageButton.grid(row=0, column=5, sticky=E+N+S)
 
 # Label packing and function
-labelphoto.grid(row=1, column=0)
+labelphoto.grid(row=1, column=0, sticky=W+N+E+S)
 labelphoto.bind('<Button-1>', labelClick)
 
 # Color Show label
