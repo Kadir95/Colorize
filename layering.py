@@ -1,4 +1,5 @@
 import numpy
+import copy
 
 class Number:                       #This class change the int to a reference type
     def __init__(self, number):
@@ -18,7 +19,9 @@ class Number:                       #This class change the int to a reference ty
         self.number += 1
 
     def __copy__(self):
-        return Number(self.number)
+        temp = Number(self.number)
+        temp.color = copy.deepcopy(self.color)
+        return temp
 
     def __str__(self):              #Override toString
         return str(self.number)
@@ -52,6 +55,9 @@ class Number:                       #This class change the int to a reference ty
         else:
             return 0
 
+    def __hash__(self):
+        return hash(self.number)
+
 class Layer:
     def __init__(self, image):
         self.image = image.copy()
@@ -84,7 +90,7 @@ class Layer:
                 return self.imagePaint
 
             # Undo Stack
-            self.undoStack.append(self.imagePaint.copy())
+            self.undoStack.append(copy.deepcopy(self.layerlist))
             self.redoStack.clear()
 
             for i in self.layerlist:
@@ -99,7 +105,7 @@ class Layer:
 
     def fourConnectedComponent(self):
         layersList = []     #LayerList keeps the references the layers numbers which keeps in a Number object.
-
+        print("start four layering")
         for y in range(0, len(self.array)):
             for x in range(0, len(self.array[0])):          #This loop to arive array's all elements
                 up = checkpixel(self.array, x, y - 1)       #up keeps the up pixel
@@ -131,6 +137,9 @@ class Layer:
                                     i.change(up.get())
 
         self.layerlist = layersList
+        print("end four layering\nOptimizer start")
+        self.LayerListOptimizer()
+        print("optimizer end")
         """
         for y in self.array:
             for x in y:
@@ -184,6 +193,7 @@ class Layer:
                         self.array[y][x] = layerList[len(layerList) - 1]
 
         self.layerlist = layerList
+        self.LayerListOptimizer()
         """
         for y in self.array:
             for x in y:
@@ -211,15 +221,19 @@ class Layer:
 
     def undo(self):
         if len(self.undoStack) > 0:
-            self.redoStack.append(self.imagePaint.copy())
-            self.imagePaint = self.undoStack.pop()
-        return self.imagePaint
+            self.redoStack.append(copy.deepcopy(self.layerlist))
+            self.refreshLayerlist(self.undoStack.pop())
+        return self.refreshImage()
 
     def redo(self):
         if len(self.redoStack) > 0:
-            self.undoStack.append(self.imagePaint.copy())
-            self.imagePaint = self.redoStack.pop()
-        return self.imagePaint
+            self.undoStack.append(copy.deepcopy(self.layerlist))
+            self.refreshLayerlist(self.redoStack.pop())
+        return self.refreshImage()
+
+    def takeUndoStrack(self):
+        self.undoStack.append(copy.deepcopy(self.layerlist))
+        self.redoStack.clear()
 
     def currentImage(self):
         if self.imagePaint is None:
@@ -231,9 +245,18 @@ class Layer:
             self.imagePaint = self.image.copy()
             self.imagePaint = self.imagePaint.convert("RGB")
 
-        # Undo Stack
-        self.undoStack.append(self.imagePaint.copy())
-        self.redoStack.clear()
+        pix = self.imagePaint.load()
+
+        for y in range(0, len(self.array)):
+            for x in range(0, len(self.array[0])):
+                pix[x, y] = self.array[y][x].color[0]
+
+        return self.imagePaint
+
+    def randrefreshImage(self):
+        if self.imagePaint is None:
+            self.imagePaint = self.image.copy()
+            self.imagePaint = self.imagePaint.convert("RGB")
 
         pix = self.imagePaint.load()
 
@@ -243,6 +266,30 @@ class Layer:
 
         return self.imagePaint
 
+    def refreshLayerlist(self, newList):
+        for i in range(0, len(self.layerlist)):
+            self.layerlist[i].number = newList[i].number
+            self.layerlist[i].color = newList[i].color
+
+    def LayerListOptimizer(self):
+        #uniqList = copy.deepcopy(self.layerlist)
+        #uniqList = list(set(uniqList))
+        control = {}
+        for i in self.layerlist:
+            if control.get(i.number) is None:
+                control[i.number] = i
+
+        uniqList = []
+        for i in control:
+            uniqList.append(control.get(i))
+            control[i] = int(len(uniqList) - 1)
+
+        for y in range(0, len(self.array)):
+            for x in range(0, len(self.array[0])):
+                if self.array[y][x].number == 0:
+                    continue
+                self.array[y][x] = uniqList[control.get(self.array[y][x].number)]
+        self.layerlist = uniqList
 
 def checkpixel(array, x, y):
     if len(array) > y >= 0 and len(array[0]) > x >= 0:

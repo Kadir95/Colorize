@@ -161,7 +161,7 @@ def UndoFunc(event):
         return
     image = currentlayer.undo()
     image = tkPhoto(image)
-    labelphoto.configure(image=image, width=image.width(), height=image.height())  # , width=im[1], height=im[2])
+    labelphoto.configure(image=image, width=image.width(), height=image.height())
     labelphoto.image = image
 
 def RedoFunc(event):
@@ -175,7 +175,7 @@ def RedoFunc(event):
         return
     image = currentlayer.redo()
     image = tkPhoto(image)
-    labelphoto.configure(image=image, width=image.width(), height=image.height())  # , width=im[1], height=im[2])
+    labelphoto.configure(image=image, width=image.width(), height=image.height())
     labelphoto.image = image
 
 def ColorPaletteColorSelecitonFunc(event):
@@ -186,7 +186,7 @@ def ColorPaletteColorSelecitonFunc(event):
     colorshowlabel.configure(bg=currentcolor[1])
 
 def RandomFill(event):
-
+    currentlayer.takeUndoStrack()
     for i in currentlayer.layerlist:
         choosencolor = random.choice(colorpaletteOBJ.colors)
         for j in currentlayer.layerlist:
