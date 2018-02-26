@@ -7,8 +7,8 @@ from PIL import Image, ImageTk
 import numpy
 import random
 
-stdsize = (1200, 800)
-stdfalldown = 127
+stdsize = (1500, 1000)
+stdfalldown = 190
 
 currentphotofilepath    = None
 currentphoto            = None
@@ -46,13 +46,11 @@ def converttoGrayscale(image):
 
 def converttobalckandwhite(image):
     image = converttoGrayscale(image)
-    image = numpy.array(image)
-    for i in range(len(image)):
-        for j in range(len(image[0])):
-            if image[i][j] >= stdfalldown:
-                image[i][j] = 255
-            else:
-                image[i][j] = 0
+    image = numpy.array(image, dtype=numpy.uint8)
+
+    image[image < stdfalldown] = 0
+    image[image >= stdfalldown] = 255
+
     image = Image.fromarray(image)
     return image
 
@@ -215,14 +213,13 @@ def imageColorSelectionButtonFunc():
 
 # Root tk object and basic windows  settings
 root = Tk()
-root.title("Image Fill")
+root.title("Colorize")
 root.resizable(False, False)
 
 # right side color palette image loading
 colorpalettefile = "Colors.palette"
 
-#ima = resizeImage(openimage('JPG-logo-highres_400x400.jpg'), size=stdsize)
-#photo = tkPhoto(converttobalckandwhite(ima[0]))
+# Image display label
 labelphoto = Label(root)
 
 topframe = Frame(root)
@@ -249,7 +246,7 @@ saveImageButton = Button(topframe, text="Save", command=savefile)
 radioFrame = Frame(topframe)
 
 # Radio Buttons
-radio_var = IntVar(value=1)
+radio_var = IntVar(value=2)
 four_connected_radiobutton = Radiobutton(radioFrame, text="Four Connected", variable=radio_var, value=1).pack(fill=X)
 eight_connected_radiobutton = Radiobutton(radioFrame, text="Eight Connected", variable=radio_var, value=2).pack(fill=X)
 

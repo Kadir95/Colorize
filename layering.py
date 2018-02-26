@@ -2,7 +2,7 @@ import numpy
 import copy
 
 class Number:                       #This class change the int to a reference type
-    def __init__(self, number):
+    def __init__(self, number=1):
         self.number = int(number)
         self.color  = ((255, 255, 255), "#ffffff")
 
@@ -108,8 +108,8 @@ class Layer:
     def fourConnectedComponent(self):
         layersList = []     #LayerList keeps the references the layers numbers which keeps in a Number object.
         print("start four layering")
-        for y in range(0, len(self.array)):
-            for x in range(0, len(self.array[0])):          #This loop to arive array's all elements
+        for y in range(0, self.array.shape[0]):
+            for x in range(0, self.array.shape[1]):          #This loop to arive array's all elements
                 up = checkpixel(self.array, x, y - 1)       #up keeps the up pixel
                 left = checkpixel(self.array, x - 1, y)     #left pixel
                 me = checkpixel(self.array, x, y)           #current pixel
@@ -142,18 +142,12 @@ class Layer:
         print("end four layering\nOptimizer start")
         self.LayerListOptimizer()
         print("optimizer end")
-        """
-        for y in self.array:
-            for x in y:
-                print("%3d" %(x.number), end=' ')
-            print()
-        """
 
     def eightConnectedComponent(self):
         layerList = []
-        print("start four layering")
-        for y in range(0, len(self.array)):
-            for x in range(0, len(self.array[0])):
+        print("start eight layering")
+        for y in range(0, self.array.shape[0]):
+            for x in range(0, self.array.shape[1]):
                 west = checkpixel(self.array, x - 1, y)
                 northwest = checkpixel(self.array, x - 1, y - 1)
                 north = checkpixel(self.array, x, y - 1)
@@ -195,26 +189,16 @@ class Layer:
                         self.array[y][x] = layerList[len(layerList) - 1]
 
         self.layerlist = layerList
-        print("end four layering\nOptimizer start")
+        print("end eight layering\nOptimizer start")
         self.LayerListOptimizer()
         print("optimizer end")
-        """
-        for y in self.array:
-            for x in y:
-                print("%3d" %(x.number), end=' ')
-            print()
-        """
 
     def createArray(self):
-        self.imagearray.copy()
-        self.array = []
-        for i in range(0, len(self.imagearray)):
-            self.array.append([None] * len(self.imagearray[0]))
+        self.array = numpy.empty(shape= (len(self.imagearray), len(self.imagearray[0])), dtype=numpy.object)
 
         one = Number(1)
         zero = Number(0)
         zero.color = ((0, 0, 0), "#000000")
-
 
         for i in range(len(self.imagearray)):
             for j in range(len(self.imagearray[0])):
@@ -293,6 +277,7 @@ class Layer:
                 if self.array[y][x].number == 0:
                     continue
                 self.array[y][x] = uniqList[control.get(self.array[y][x].number)]
+
         self.layerlist = uniqList
 
 def checkpixel(array, x, y):
