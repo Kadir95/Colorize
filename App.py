@@ -7,8 +7,6 @@ from PIL import Image, ImageTk
 import numpy
 import random
 
-# image scaling
-
 stdsize = (1200, 800)
 stdfalldown = 127
 
@@ -199,6 +197,17 @@ def RandomFill(event):
     labelphoto.image = image
     return
 
+def ClearButtonFunc():
+    currentlayer.takeUndoStrack()
+    for i in currentlayer.layerlist:
+        i.giveColor(((255, 255, 255), "#ffffff"))
+
+    image = currentlayer.refreshImage()
+    image = tkPhoto(image)
+    labelphoto.configure(image=image, width=image.width(), height=image.height())  # , width=im[1], height=im[2])
+    labelphoto.image = image
+    return
+
 def imageColorSelectionButtonFunc():
     global imageColorSelection
     imageColorSelection = True
@@ -259,6 +268,9 @@ redoButton.grid(row=1, column=0, sticky=W+E)
 # Random Fill Button
 randomfillbutton = Button(topframe, text="Random\nFill")
 
+# Clear Button
+clearbutton = Button(topframe, text="Clear", command=ClearButtonFunc)
+
 # Show color selection
 colorshowlabel = Label(leftframe, width=5, height=3, bg=currentcolor[1])
 
@@ -284,6 +296,9 @@ redoButton.bind('<Button-1>', RedoFunc)
 # Random Fill Button packing and Func
 randomfillbutton.grid(row=0, column=6, sticky=E+N+S)
 randomfillbutton.bind('<Button-1>', RandomFill)
+
+# Clear Button packing
+clearbutton.grid(row=0, column=7, sticky=E+N+S)
 
 # Save Image Button packing
 saveImageButton.grid(row=0, column=5, sticky=E+N+S)

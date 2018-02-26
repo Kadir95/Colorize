@@ -58,6 +58,8 @@ class Number:                       #This class change the int to a reference ty
     def __hash__(self):
         return hash(self.number)
 
+# four and eight connected layering optimization
+
 class Layer:
     def __init__(self, image):
         self.image = image.copy()
@@ -149,7 +151,7 @@ class Layer:
 
     def eightConnectedComponent(self):
         layerList = []
-
+        print("start four layering")
         for y in range(0, len(self.array)):
             for x in range(0, len(self.array[0])):
                 west = checkpixel(self.array, x - 1, y)
@@ -193,7 +195,9 @@ class Layer:
                         self.array[y][x] = layerList[len(layerList) - 1]
 
         self.layerlist = layerList
+        print("end four layering\nOptimizer start")
         self.LayerListOptimizer()
+        print("optimizer end")
         """
         for y in self.array:
             for x in y:
