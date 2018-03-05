@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 import numpy
 import random
 
-stdsize = (1500, 1000)
+stdsize = (1920, 1080)
 stdfalldown = 190
 
 currentphotofilepath    = None
@@ -126,12 +126,11 @@ def labelClick(event):
         return
     image = currentlayer.paint(event.x, event.y, currentcolor)
     image = tkPhoto(image)
-    labelphoto.configure(image=image, width=image.width(), height=image.height())  # , width=im[1], height=im[2])
+    labelphoto.configure(image=image, width=image.width(), height=image.height())
     labelphoto.image = image
     print("x:", event.x, " y:", event.y)
 
 def sliderFunction(value):
-    #print("slider value : ", value)
     global stdfalldown
     stdfalldown = int(value)
 
@@ -185,9 +184,7 @@ def RandomFill(event):
     currentlayer.takeUndoStrack()
     for i in currentlayer.layerlist:
         choosencolor = random.choice(colorpaletteOBJ.colors)
-        for j in currentlayer.layerlist:
-            if i == j:
-                j.giveColor(choosencolor)
+        i.giveColor(choosencolor)
 
     image = currentlayer.refreshImage()
     image = tkPhoto(image)

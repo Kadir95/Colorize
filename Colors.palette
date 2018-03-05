@@ -1,3 +1,6 @@
+>>To add a color, just write the color's RGB code beginning of a line.
+>>just white spaces (tab, space) can be use to separate the numbers
+
 # Rainbow
 248  12  18	Untitled
 238  17   0	Untitled
@@ -17,7 +20,7 @@
  51  17 187	Untitled
  59  12 189	Untitled
  68  34 153	Untitled
-#
+
 # GMT no green
  32  96 255	Untitled
  32 159 255	Untitled
@@ -35,7 +38,7 @@
 255 112   0	Untitled
 255  77   0	Untitled
 255   0   0	Untitled
-#
+
 # Spectral 10
 158   1  66	Untitled
 213  62  79	Untitled
@@ -47,7 +50,7 @@
 102 194 165	Untitled
  50 136 189	Untitled
  94  79 162	Untitled
-#
+
 # Kawaii in Detail
 239   0  67	Untitled
 239  43  77	Untitled
@@ -63,7 +66,7 @@
 227 247 252	Untitled
 194 239 249	Untitled
 130 227 245	Untitled
-#
+
 # Neon Rainbow
 253 104 118	Untitled
 253 201 103	Untitled
@@ -72,7 +75,7 @@
 104 253 237	Untitled
 104 156 252	Untitled
 164 104 252	Untitled
-#
+
 # Colores
  26  19  52	Untitled
  38  41  74	Untitled
@@ -86,7 +89,7 @@
 161  42  94	Untitled
 113   1  98	Untitled
   2  44 125	Untitled
-#
+
 # Trove
  81  87  74	Untitled
  68 124 105	Untitled
@@ -109,7 +112,7 @@
 124 159 176	Untitled
  86 152 196	Untitled
 154 191 136	Untitled
-#
+
 # Android Palette
 127   0   0	Untitled
 204   0   0	Untitled

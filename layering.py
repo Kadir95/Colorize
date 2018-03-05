@@ -107,7 +107,7 @@ class Layer:
 
     def fourConnectedComponent(self):
         layersList = []     #LayerList keeps the references the layers numbers which keeps in a Number object.
-        print("start four layering")
+        print("Four Layering started")
         for y in range(0, self.array.shape[0]):
             for x in range(0, self.array.shape[1]):          #This loop to arive array's all elements
                 up = checkpixel(self.array, x, y - 1)       #up keeps the up pixel
@@ -139,13 +139,13 @@ class Layer:
                                     i.change(up.get())
 
         self.layerlist = layersList
-        print("end four layering\nOptimizer start")
+        print("Four Layering ended\nOptimizer started")
         self.LayerListOptimizer()
-        print("optimizer end")
+        print("Optimizer ended")
 
     def eightConnectedComponent(self):
         layerList = []
-        print("start eight layering")
+        print("Eight Layering started")
         for y in range(0, self.array.shape[0]):
             for x in range(0, self.array.shape[1]):
                 west = checkpixel(self.array, x - 1, y)
@@ -176,6 +176,7 @@ class Layer:
                                 for j in layerList:
                                     if j.get() == temp:
                                         j.change(others[0])
+
                         else:
                             self.array[y][x] = same[0]
                             for i in others:
@@ -189,9 +190,9 @@ class Layer:
                         self.array[y][x] = layerList[len(layerList) - 1]
 
         self.layerlist = layerList
-        print("end eight layering\nOptimizer start")
+        print("Eight Layering ended\nOptimizer started")
         self.LayerListOptimizer()
-        print("optimizer end")
+        print("Optimizer ended")
 
     def createArray(self):
         self.array = numpy.empty(shape= (len(self.imagearray), len(self.imagearray[0])), dtype=numpy.object)
@@ -260,8 +261,6 @@ class Layer:
             self.layerlist[i].color = newList[i].color
 
     def LayerListOptimizer(self):
-        #uniqList = copy.deepcopy(self.layerlist)
-        #uniqList = list(set(uniqList))
         control = {}
         for i in self.layerlist:
             if control.get(i.number) is None:
